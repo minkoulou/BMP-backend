@@ -1,0 +1,134 @@
+# Application de demande de stage en ligne — Backend
+
+Backend de l'application web de demande de stage en ligne, avec tableau de bord administrateur.
+Projet de fin de formation WORKETYAMO.
+
+## Fonctionnalités
+
+- Consultation publique des offres de stage (sans compte requis)
+- Soumission d'une demande de stage avec CV et choix d'un créneau de rendez-vous
+- Authentification admin sécurisée (JWT access/refresh token)
+- Gestion des offres de stage (CRUD) réservée à l'administrateur
+- Suivi des demandes reçues (statuts : en attente, acceptée, refusée)
+- Notification automatique par email à chaque nouvelle demande
+- Statistiques sur le volume et la nature des demandes
+- Gestion du calendrier des créneaux de rendez-vous
+
+## Stack technique
+
+- **Runtime** : Node.js
+- **Framework** : Express
+- **ORM** : Prisma
+- **Base de données** : MongoDB Atlas
+- **Authentification** : JWT (access token courte durée, refresh token longue durée)
+- **Upload de fichiers** : Multer
+- **Notifications email** : Nodemailer
+
+## Modèle de données
+
+4 modèles Prisma :
+
+ Modèle | Rôle 
+
+ `Admin` | Compte unique de l'administrateur 
+ `Offre` | Offre de stage publiée 
+ `Creneau` | Créneau de rendez-vous disponible/bloqué 
+ `DemandeStage` | Candidature déposée par un candidat, liée à une `Offre` et un `Creneau` 
+
+## Structure du projet
+
+```
+backend/
+├── controllers/       # Logique métier (Admin, Offre, ...)
+├── routes/             # Définition des routes Express
+│   └── routeAdmin.js    # Routes admin
+│   └── routeOffre.js    #Routes Offres
+├── lib/                 # Instance Prisma Client
+├── prisma/
+│   └── schema.prisma   # Modèles de données
+├── app.js               # Configuration Express (middlewares, routes)
+├── serveur.js           # Point d'entrée du serveur
+└── .env                 # Variables d'environnement (non versionné)
+```
+
+## Installation
+
+```bash
+git clone https://github.com/minkoulou/BMP-backend.git
+cd backend
+npm install
+```
+
+## Configuration
+
+Créez un fichier `.env` à la racine avec les variables suivantes :
+
+```env
+DATABASE_URL="mongodb+srv://<user>:<password>@<cluster>.mongodb.net/stageDB?retryWrites=true&w=majority"
+
+JWT_SECRET_ACCESS="..."
+JWT_SECRET_REFRESH="..."
+
+ADMIN_EMAIL="..."
+ADMIN_PASSWORD="..."
+```
+
+Générez des secrets JWT robustes avec :
+```bash
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+```
+
+## Base de données
+
+```bash
+npx prisma generate   # génère le client Prisma
+npx prisma db push    # synchronise le schéma avec MongoDB
+```
+
+## Lancer le serveur
+
+```bash
+node serveur.js (ou nodemon une fois installe)
+```
+
+## Création du compte administrateur
+
+Il n'existe pas de route d'inscription publique. Le compte admin unique est créé une seule fois via la route de signup, en appelant l'endpoint suivant avec Postman :
+
+```
+POST /api/admin/signup
+```
+
+Les identifiants (`ADMIN_EMAIL`, `ADMIN_PASSWORD`) sont lus depuis le fichier `.env`, pas depuis le corps de la requête.
+
+## Principales routes
+
+### Authentification admin
+
+ Méthode | Route | Description |
+
+ POST | `/api/admin/signup` | Création/mise à jour du compte admin (usage ponctuel) |
+ POST | `/api/admin/login` | Connexion admin, retourne un access token |
+
+### Offres de stage
+
+ Méthode | Route | Accès | Description 
+
+ GET | `/api/offres` | Public | Liste des offres disponibles |
+ POST | `/api/admin/offres` | Admin | Créer une offre |
+ PUT | `/api/admin/offres/:id` | Admin | Modifier une offre |
+ DELETE | `/api/admin/offres/:id` | Admin | Supprimer une offre |
+
+### Demandes de stage
+
+ Méthode | Route | Accès | Description |
+
+ POST | `/api/demandes` | Public | Soumettre une candidature (formulaire + CV) |
+ GET | `/api/admin/demandes` | Admin | Consulter les demandes reçues |
+ PUT | `/api/admin/demandes/:id` | Admin | Traiter une demande (accepter/refuser) |
+
+Les routes `/api/admin/*` (hors login/signup) sont protégées par un middleware de vérification du token JWT.
+
+## Auteur
+
+MINKOULOU MINKOULOU BENOIT PASCAL — étudiant en L3 Informatique, Université de Yaoundé I
