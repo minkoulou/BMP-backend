@@ -44,6 +44,8 @@ backend/
 │   └── routeAdmin.js    # Routes admin
 │   └── routeOffre.js    #Routes Offres
 ├── lib/                 # Instance Prisma Client
+├── middleware/             # definission des middlewares
+│   └── Authmiddleware.js    # middleware d'authentification
 ├── prisma/
 │   └── schema.prisma   # Modèles de données
 ├── app.js               # Configuration Express (middlewares, routes)
