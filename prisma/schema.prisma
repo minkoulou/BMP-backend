@@ -13,9 +13,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Admin{
+model Admin {
   id       String @id @default(uuid()) @map("_id")
-  email    String
+  email    String @unique
   name     String
-  password String
+  password String 
+  refreshToken String?
 }
+
+model OffreStage {
+  id           String @id @default(uuid()) @map("_id")
+  nomOffre     String 
+  intitule     String
+  description  String
+}
+
+
