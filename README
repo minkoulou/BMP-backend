@@ -40,9 +40,13 @@ Projet de fin de formation WORKETYAMO.
 ```
 backend/
 ├── controllers/       # Logique métier (Admin, Offre, ...)
+│   └── AuthAdmin.js    # logique admin
+│   └── Offre.js    #logique Offres
+│   └── creneau.js    #logique creneaux
 ├── routes/             # Définition des routes Express
 │   └── routeAdmin.js    # Routes admin
 │   └── routeOffre.js    #Routes Offres
+│   └── routeCreneau.js    #Routes creneaux
 ├── lib/                 # Instance Prisma Client
 ├── middleware/             # definission des middlewares
 │   └── Authmiddleware.js    # middleware d'authentification

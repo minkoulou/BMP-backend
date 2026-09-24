@@ -13,6 +13,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Statut{
+  ATTENTTE 
+  EN_COURS
+  TERMINE
+}
+
 model Admin {
   id       String @id @default(uuid()) @map("_id")
   email    String @unique
@@ -26,6 +32,30 @@ model OffreStage {
   nomOffre     String 
   intitule     String
   description  String
+  demande      DemandeStage[] 
+}
+
+model Creneau {
+  id           String @id @default(uuid()) @map("_id")
+  date         DateTime
+  heureDebut   String 
+  heureFin     String 
+  disponible   Boolean @default(true)
+  demande      DemandeStage?
+}
+
+model DemandeStage  {
+  id             String @id @default(uuid()) @map("_id")
+  nom            String 
+  prenom         String
+  etablissement  String
+  email          String
+  cv             String
+  statutDemande  Statut
+  offre          OffreStage @relation(fields: [offreId], references: [id])
+  offreId         String 
+  creneau         Creneau  @relation(fields: [creneauId],references: [id])
+  creneauId       String @unique
 }
 
 

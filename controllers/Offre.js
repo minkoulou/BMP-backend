@@ -25,7 +25,7 @@ const offreStage = {
         }
     })
 
-    return res.status(201).json({message:'Offre cree avec succes', offre:created})
+    return res.status(201).json({message:'Offre cree avec succes · 🎉', offre:created})
 
     } catch (error) {
         return res.status(500).json({message:`${error}`})
