@@ -125,6 +125,16 @@ Les identifiants (`ADMIN_EMAIL`, `ADMIN_PASSWORD`) sont lus depuis le fichier `.
  PUT | `/api/admin/offres/:id` | Admin | Modifier une offre |
  DELETE | `/api/admin/offres/:id` | Admin | Supprimer une offre |
 
+ ### creneaux
+
+ Méthode | Route | Accès | Description |
+
+ POST | `/api/admin/creneau` | Admin | creation d'un creneau
+ GET | `/api/admin/creneau` | Admin | consulter tous les creneaux
+ GET | `/api/admin/creneau` | public |choix des creneaux par les utilisateurs parmi les creneaux diponibles
+ PUT | `/api/admin/creneau/:id` | Admin | Mise à jour des creneaux (true (dispo) / false(non dispo))
+
+
 ### Demandes de stage
 
  Méthode | Route | Accès | Description |
@@ -132,6 +142,7 @@ Les identifiants (`ADMIN_EMAIL`, `ADMIN_PASSWORD`) sont lus depuis le fichier `.
  POST | `/api/demandes` | Public | Soumettre une candidature (formulaire + CV) |
  GET | `/api/admin/demandes` | Admin | Consulter les demandes reçues |
  PUT | `/api/admin/demandes/:id` | Admin | Traiter une demande (accepter/refuser) |
+
 
 Les routes `/api/admin/*` (hors login/signup) sont protégées par un middleware de vérification du token JWT.
 
