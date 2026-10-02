@@ -1,6 +1,5 @@
 import {prisma} from '../lib/prisma.js'
-// import bcrypt from 'bcrypt'
-// import 'dotenv/config'
+
 import {v4 as uuidv4} from 'uuid'
 
 const offreStage = {

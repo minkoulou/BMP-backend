@@ -15,6 +15,7 @@ datasource db {
 
 enum Statut{
   ATTENTTE 
+  ACCEPTE
   EN_COURS
   TERMINE
 }
@@ -51,11 +52,12 @@ model DemandeStage  {
   etablissement  String
   email          String
   cv             String
-  statutDemande  Statut
+  statutDemande  Statut @default(ATTENTTE)
   offre          OffreStage @relation(fields: [offreId], references: [id])
   offreId         String 
   creneau         Creneau  @relation(fields: [creneauId],references: [id])
   creneauId       String @unique
 }
+
 
 

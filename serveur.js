@@ -1,4 +1,4 @@
-import app from "./app.js";
+import app from "./src/app.js";
 
 const PORT=3000;
 const localhost='127.0.0.1'

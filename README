@@ -16,7 +16,7 @@ Projet de fin de formation WORKETYAMO.
 
 ## Stack technique
 
-- **Runtime** : Node.js
+- **Environement d'execution** : Node.js
 - **Framework** : Express
 - **ORM** : Prisma
 - **Base de données** : MongoDB Atlas
@@ -39,20 +39,25 @@ Projet de fin de formation WORKETYAMO.
 
 ```
 backend/
-├── controllers/       # Logique métier (Admin, Offre, ...)
-│   └── AuthAdmin.js    # logique admin
-│   └── Offre.js    #logique Offres
-│   └── creneau.js    #logique creneaux
-├── routes/             # Définition des routes Express
-│   └── routeAdmin.js    # Routes admin
-│   └── routeOffre.js    #Routes Offres
-│   └── routeCreneau.js    #Routes creneaux
-├── lib/                 # Instance Prisma Client
-├── middleware/             # definission des middlewares
-│   └── Authmiddleware.js    # middleware d'authentification
+├── src/ 
+│     ├── controllers/       # Logique métier (Admin, Offre, ...)
+│       └── AuthAdmin.js    # logique admin
+│       └── Offre.js    #logique Offres
+│       └── creneau.js    #logique creneaux
+│       └── demande.js    #logique des demmandes de stages
+│
+│     ├── routes/             # Définition des routes Express
+│        └── routeAdmin.js    # Routes admin
+│        └── routeOffre.js    #Routes Offres
+│        └── routeCreneau.js    #Routes creneaux
+│        └── routedemande.js    #Routes demandes
+│
+│     ├── lib/                 # Instance Prisma Client
+│         ├── middleware/             # definission des middlewares
+│          └── Authmiddleware.js    # middleware d'authentification
 ├── prisma/
 │   └── schema.prisma   # Modèles de données
-├── app.js               # Configuration Express (middlewares, routes)
+│         ├── app.js               # Configuration Express (middlewares, routes)
 ├── serveur.js           # Point d'entrée du serveur
 └── .env                 # Variables d'environnement (non versionné)
 ```
