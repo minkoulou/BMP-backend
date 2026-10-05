@@ -9,7 +9,7 @@ import jsonwebtoken from 'jsonwebtoken'
             return jsonwebtoken.sign(
                 {id:user.id,email:user.email},
                 process.env.JWT_SECRET_ACCESS,
-                {expiresIn:'15m'}
+                {expiresIn:'30m'}
             )
         }
 
@@ -17,7 +17,7 @@ import jsonwebtoken from 'jsonwebtoken'
            return jsonwebtoken.sign( 
             {id:user.id,email:user.email},
             process.env.JWT_SECRET_REFRESH,
-            {expiresIn:'30d'}
+            {expiresIn:'60d'}
            )
         }
 
@@ -51,7 +51,7 @@ const AuthAdmin = {
             where:{email:valueMail}
         })
 
-        return res.status(200).json({message:`le nouveau nom administrateur est : ${name} · 🎉`})
+        return res.status(200).json({message:`le nouveau nom administrateur est : ${name} ·`})
 
          } catch (error) {
         return res.status(500).json({message:`${error}`})

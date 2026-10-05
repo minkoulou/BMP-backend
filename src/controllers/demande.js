@@ -10,8 +10,8 @@ export const DemandeStage = {
 
   try {
   
-        const {nom,prenom,etablissement,email,offreId,creneauId}=req.body;
-
+        const {nom,prenom,telephone,email,offreId,creneauId}=req.body;
+           
          if(!req.file) return res.status(400).json({message:'veillez entrer votre Cv'})
 
         const {buffer,mimetype,originalname}=req.file
@@ -20,10 +20,11 @@ export const DemandeStage = {
 
         const filePath=`${uuidv4()}-${originalname}`
 
-        if(!nom || !prenom || !etablissement || !email){
+        if(!nom || !prenom || !telephone || !email){
                      
                  return res.status(400).json({message:'Donnes manquantes'})
         }
+
 
 // Envoie du fichier cv dans Supabase Storage
 
@@ -33,11 +34,20 @@ export const DemandeStage = {
 
          if(error) return res.status(400).json({error:error.message})
 
-            // envoie du contenue avec le nom du fichier en base de donnee mongodb
+// construction du num de reference pour chaque demande 
+
+            const prefixe = nom.slice(0,3).toUpperCase()
+
+            const suffixe = Math.floor(Math.random()*9999 + 10000)
+
+            const ref =`${prefixe}-${suffixe}`
+
+// envoie du contenue avec le nom du fichier en base de donnee mongodb
         const data = await prisma.demandeStage.create({data:{
             nom,
             prenom,
-            etablissement,
+            telephone,
+            reference:ref,
             email,
             cv:filePath,
             offreId,
@@ -57,8 +67,7 @@ export const DemandeStage = {
                 }
 
                                                         })
-
-  await mailSend.sendMessage(email,nom).catch((error)=>{console.log(error)})
+  await mailSend.sendMessage(email,nom,ref).catch((error)=>{console.log(error)})
 
    return res.status(200).json({data})
           
@@ -72,7 +81,8 @@ export const DemandeStage = {
 
  },
  
-  //  recuperaturation de l'url du cv stocke dans supabase 
+
+ //  recuperation de l'url du cv stocke dans supabase 
 
  getCv: async (req,res)=>{
 
@@ -116,7 +126,9 @@ export const DemandeStage = {
        
         await prisma.demandeStage.update({where:{id},data:{statutDemande}})
 
-  await mailSend.sendMessage(verif.email,verif.nom).catch((error)=>{console.log(error)})
+  console.log(verif.email)
+
+  await mailSend.sendUpdated(statutDemande,verif.email).catch((error)=>{console.log(error)})
 
   return res.status(204).json()
 
@@ -125,7 +137,7 @@ export const DemandeStage = {
     }
  },
 
-//  recuperation de des demandes
+//  recuperation de toutes les demandes
 
  getAllDemande:async(req,res)=>{
 
@@ -137,6 +149,50 @@ export const DemandeStage = {
     } catch (error) {
         return res.status(500).json({message:`${error}`})
     }
- }
+ },
+ 
+//  recuperation d'une demande specifique
 
+  getDemande: async (req,res)=>{
+    try {
+
+        const {reference}=req.params
+
+        const demande= await prisma.demandeStage.findUnique({where:{reference}})
+
+        if(!demande){
+            return res.status(404).json({message:'demande introuvable'})
+        }
+    console.log(demande.offre.nomOffre)
+    return res.status(200).json(demande)
+        
+    } catch (error) {
+        return  res.status(500).json({message:`${error}`})
+    }
+
+  },
+
+//   suppression d'une demande 
+
+  deleteDemande:async(req,res)=>{
+
+    try {
+        
+        const {id} =req.params
+
+        const recup = await prisma.demandeStage.findUnique({where:{id}})
+
+        if(!recup) {
+            return res.status(404).json({message:'Demande non existante'})
+        }
+
+         await prisma.demandeStage.delete({where:{id}})
+
+         return res.status(204).json()
+
+    } catch (error) {
+        
+        return res.status(500).json({message:error})
+    }
+  }
  }
