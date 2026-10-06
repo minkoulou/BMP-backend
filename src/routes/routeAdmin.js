@@ -5,3 +5,4 @@ export const adminRouter=Router()
 
 adminRouter.post('/admin/Register',AuthAdmin.signup)
 adminRouter.post('/admin/login',AuthAdmin.login)
+adminRouter.post('admin/refresh-token',AuthAdmin.refreshToken)

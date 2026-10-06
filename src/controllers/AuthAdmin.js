@@ -86,6 +86,17 @@ const AuthAdmin = {
             {where:{email},
             data:{refreshToken:RefreshToken}}
         )
+
+        // mise du refreshtoken dans le cookie 
+
+           res.cookie('refreshToken',RefreshToken,{
+            httpOnly:true,
+            sameSite:'strict',
+            secure:process.env.NODE_EN==='production',
+            maxAge: 1000*60*60*24*30
+
+        }
+    )
          
         return res.status(200).json({message:'Connexion reussie' , 
                                      AccessToken,
@@ -95,6 +106,43 @@ const AuthAdmin = {
      } catch (error) {
         return res.status(500).json({message:`${error}`})
      }
+ },
+
+ refreshToken: async(req,res) =>{
+
+    try {
+        
+   
+ 
+       const refresh = req.cookie.refreshToken
+
+       if(!refresh) return res.statusa(401).json({message:'Refreshtoken manquant'})
+
+        try {
+
+            const decoded = jsonwebtoken.verify(refresh,JWT_SECRET_REFRESH)
+
+        } catch (error) {
+
+         if(error.message==='TokenExpiredError') {return res.status(401).json({message:'Token expire'})}
+
+         return res.status(401).json({message:'token invalide'})
+            
+        }
+
+        const admin= await prisma.admin.findUnique({where:{id:decoded.id}})
+
+        if(!admin || admin.refreshToken !==refresh) return res.status(401).json({message:'Token invalid'})
+
+            const newToken = generateAccessToken(admin)
+
+            return res.status(200).json({message:newToken})
+
+         } catch (error) {
+         
+             return res.status(500).json({message:error.message})
+    }
+ 
  }
 
 }

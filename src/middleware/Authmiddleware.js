@@ -9,6 +9,7 @@ import 'dotenv/config'
   const header =  req.headers.authorization
   
   if(!header || !header.startsWith('Bearer ')){
+
     return res.status(404).json({message:'Token invalide'})
   }
   
@@ -21,11 +22,14 @@ import 'dotenv/config'
    next()  
 
 } catch (error) {
+
     if(error.name ==='TokenExpiredError'){
+
         return res.status(401).json({message:'token expire'})
     }
 
     if(error.name ==='JsonWebTokenError'){
+        
         return res.status(401).json({message:'token invalide '})
     }
 
