@@ -10,7 +10,7 @@ import 'dotenv/config'
   
   if(!header || !header.startsWith('Bearer ')){
 
-    return res.status(404).json({message:'Token invalide'})
+    return res.status(401).json({message:'Token invalide'})
   }
   
   const Token = header.split(' ')[1]

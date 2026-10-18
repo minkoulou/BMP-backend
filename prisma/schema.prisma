@@ -43,6 +43,8 @@ model Creneau {
   heureFin     String 
   disponible   Boolean @default(true)
   demande      DemandeStage?
+
+  @@unique([date,heureDebut,heureFin])
 }
 
 model DemandeStage  {

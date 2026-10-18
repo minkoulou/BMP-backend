@@ -71,7 +71,7 @@ const offreStage = {
            return res.status(200).json({message:'offre mise a jour',Offre:updated})
           
         } catch (error) {
-          return res.status(500).json({messag:`${error}`})
+          return res.status(500).json({message:`${error}`})
         }
 
   },
@@ -89,7 +89,7 @@ const offreStage = {
 
      await prisma.offreStage.delete({where:{id}})
 
-      return res.status(204)
+      return res.status(204).json()
 
     } catch (error) {
       return res.status(500).json({message:`${error}`})

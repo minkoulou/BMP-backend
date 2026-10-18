@@ -4,6 +4,7 @@ import { offreRoute } from './routes/routeOffre.js'
 import  {creneauRouter} from './routes/routeCreneau.js'
 import {routedemandeStage} from './routes/routedemandes.js'
 import cookieParser from 'cookie-parser'
+
 const app = express()
 
 app.use((req,res,next)=>{

@@ -6,6 +6,7 @@ import {v4 as uuidv4} from 'uuid'
  const creneau = {
 
     createCreneau:async (req,res)=>{
+
            try {
             
             const {date,heureDebut,heureFin}= req.body
@@ -13,16 +14,20 @@ import {v4 as uuidv4} from 'uuid'
             if(!date || !heureDebut || !heureFin){
 
                return res.status(400).json({message:'remplir tous les champs'})
-
+               
             }
 
           const data =  await prisma.creneau.create({data:{
                 id:uuidv4(),
-                date,
+                date:new Date(date),
                 heureDebut,
                 heureFin,
                 disponible:true
-            }})
+            },
+
+          include:{demandeStage:{select:{nom:true}}
+         
+         }})
 
             return res.status(201).json({message:'Creneau cree avec succes · 🎉', data })
 

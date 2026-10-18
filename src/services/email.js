@@ -71,7 +71,7 @@ sendUpdated: async(statutDemande,email)=>{
         </h2>
      
         <p style="margin:0 0 12px;">
-          Votre demande actuelle viens e passer à l'état :<i style="font-weight:bold;"> ${statutDemande} </i..
+          Votre demande actuelle viens e passer à l'état :<i style="font-weight:bold;"> ${statutDemande} </i>
         </p>
         <p style="margin:0 0 12px;">
           Notre équipe  Vous informera des avancements à venir
@@ -87,7 +87,7 @@ sendUpdated: async(statutDemande,email)=>{
 
    const info = await transporter.sendMail(mailOption)
 
-            console.log("message envoye avec success a :",info.messageTime) 
+            console.log("message envoye avec success a :",info.messageId) 
     } catch (error) {
         console.error("une erreur est survenue lors de l'envoie du mail:",error)
  

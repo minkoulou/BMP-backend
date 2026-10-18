@@ -26,7 +26,7 @@ const AuthAdmin = {
    signup:async (req,res)=>{
 
      try {
-        const {name,refreshToken}=req.body
+        const {name}=req.body
        
         const valuePass=process.env.ADMIN_PASSWORD
 
@@ -46,7 +46,7 @@ const AuthAdmin = {
                 refreshToken:null
             }
             ,
-            update:{name,refreshToken}
+            update:{}
             ,
             where:{email:valueMail}
         })
@@ -58,6 +58,7 @@ const AuthAdmin = {
      }
    },
 
+
  login: async (req,res) => {
 
      try {
@@ -67,12 +68,14 @@ const AuthAdmin = {
         const admin = await prisma.admin.findUnique({where:{email}})
 
         if (!admin){
+
             return res.status(404).json({message:'Administrateur non existant'})
+
         }
 
         const verifyPassword = await bcrypt.compare(password,admin.password);
 
-        if(verifyPassword === false){
+        if(!verifyPassword){
 
            return res.status(404).json({message:'Identifiants Invalides'})
 
@@ -80,7 +83,7 @@ const AuthAdmin = {
 
        const RefreshToken = generateRefreshToken(admin)
 
-        const AccessToken= generateAccessToken(admin)
+       const AccessToken= generateAccessToken(admin)
 
         await prisma.admin.update(
             {where:{email},
@@ -92,7 +95,7 @@ const AuthAdmin = {
            res.cookie('refreshToken',RefreshToken,{
             httpOnly:true,
             sameSite:'strict',
-            secure:process.env.NODE_EN==='production',
+            secure:process.env.NODE_ENV==='production',
             maxAge: 1000*60*60*24*30
 
         }
@@ -100,7 +103,7 @@ const AuthAdmin = {
          
         return res.status(200).json({message:'Connexion reussie' , 
                                      AccessToken,
-                                     Admin:{email:admin.email,password:admin.password}
+                                     Admin:{email:admin.email}
                             })
 
      } catch (error) {
@@ -108,31 +111,33 @@ const AuthAdmin = {
      }
  },
 
- refreshToken: async(req,res) =>{
+//  logique pour l'expiration du token 
+
+ refreshToken : async (req,res) =>{
 
     try {
-        
-   
  
-       const refresh = req.cookie.refreshToken
+       const refresh = req.cookies.refreshToken
 
-       if(!refresh) return res.statusa(401).json({message:'Refreshtoken manquant'})
+       if(!refresh) return res.status(401).json({message:'Refreshtoken manquant'})
 
+         let decoded
+         
         try {
 
-            const decoded = jsonwebtoken.verify(refresh,JWT_SECRET_REFRESH)
+             decoded = jsonwebtoken.verify(refresh,process.env.JWT_SECRET_REFRESH)
 
         } catch (error) {
 
-         if(error.message==='TokenExpiredError') {return res.status(401).json({message:'Token expire'})}
+         if(error.name === 'TokenExpiredError') {return res.status(401).json({message:'Token expire'})}
 
          return res.status(401).json({message:'token invalide'})
             
         }
 
-        const admin= await prisma.admin.findUnique({where:{id:decoded.id}})
+        const admin = await prisma.admin.findUnique({where:{id:decoded.id}})
 
-        if(!admin || admin.refreshToken !==refresh) return res.status(401).json({message:'Token invalid'})
+        if(!admin || admin.refreshToken !== refresh) return res.status(401).json({message:'Token invalid'})
 
             const newToken = generateAccessToken(admin)
 

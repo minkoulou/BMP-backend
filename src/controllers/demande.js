@@ -8,25 +8,38 @@ export const DemandeStage = {
   
     CreateDemande : async(req,res)=>{
 
+      let filePath = null
+
   try {
   
         const {nom,prenom,telephone,email,offreId,creneauId}=req.body;
            
          if(!req.file) return res.status(400).json({message:'veillez entrer votre Cv'})
 
-        const {buffer,mimetype,originalname}=req.file
+        const {buffer,mimetype,originalname} = req.file
 
         console.log(req.file)
 
         const filePath=`${uuidv4()}-${originalname}`
 
-        if(!nom || !prenom || !telephone || !email){
+        if(!nom || !prenom || !telephone || !email || !offreId || !creneauId){
                      
                  return res.status(400).json({message:'Donnes manquantes'})
         }
 
+        // verification des offres et de la disponibilte des creneaux
 
-// Envoie du fichier cv dans Supabase Storage
+        const offre = await prisma.offreStage.findUnique({where:{id:offreId}})
+
+        if(!offre) return res.status(404).json({message:'offre non retrouve'})
+
+        
+        const creneau = await prisma.creneau.findUnique({where:{id:creneauId}})
+
+        if(creneau || !creneau.disponible) return res.status(409).json({message:'Creneau indisponible '})
+
+            
+            // Envoie du fichier cv dans Supabase Storage
 
            const {error} = await supabase.storage
             .from('cv')
@@ -66,7 +79,8 @@ export const DemandeStage = {
                             }
                 }
 
-                                                        })
+            })
+
   await mailSend.sendMessage(email,nom,ref).catch((error)=>{console.log(error)})
 
    return res.status(200).json({data})
@@ -74,26 +88,29 @@ export const DemandeStage = {
 
     } catch (error) {
 
+    supabase.storage.from('cv').remove([filePath])
+
     return res.status(500).json({message:`${error}`})
 
-    return supabase.storage.from('cv').remove([filePath])
     }
 
  },
  
 
- //  recuperation de l'url du cv stocke dans supabase 
+ //  recuperation de l'url du cv stocké dans supabase 
 
- getCv: async (req,res)=>{
+ getCv: async (req,res) => {
 
     try {
 
-         const{id}=req.params
+         const {id} = req.params
 
-    const demande= await prisma.demandeStage.findUnique({where:{id},select:{cv:true}})
+    const demande = await prisma.demandeStage.findUnique({where:{id},select:{cv:true}})
 
     if(!demande){
+
         return res.status(404).json({message:'demande introuvable'})
+
     }
 
     const {data} = await supabase.storage.from('cv').getPublicUrl(demande.cv)
@@ -104,7 +121,7 @@ export const DemandeStage = {
         
 
     } catch (error) {
-        return res.status(500).json({message:error})
+        return res.status(500).json({message:error.name})
     }
 
  },
@@ -116,9 +133,12 @@ export const DemandeStage = {
     try {
          
         const {id}=req.params
-        const {statutDemande}=req.body
 
-        const verif= await prisma.demandeStage.findUnique({where:{id}})
+        const { statutDemande } = req.body
+
+        if(!statutDemande) return res.status(400).json({message:'Veillez entrer le statut de la demande'})
+
+        const verif = await prisma.demandeStage.findUnique({where:{id}})
 
         if(!verif){
             return res.status(404).json({message:'Demande non existante'})
@@ -139,10 +159,11 @@ export const DemandeStage = {
 
 //  recuperation de toutes les demandes
 
- getAllDemande:async(req,res)=>{
+ getAllDemande: async(req,res)=>{
 
     try {
-        const demandes= await prisma.demandeStage.findMany()
+
+        const demandes = await prisma.demandeStage.findMany()
 
         return res.status(200).json(demandes)
         
@@ -153,28 +174,34 @@ export const DemandeStage = {
  
 //  recuperation d'une demande specifique
 
-  getDemande: async (req,res)=>{
+  getDemande: async (req,res) => {
+
     try {
 
         const {reference}=req.params
 
-        const demande= await prisma.demandeStage.findUnique({where:{reference}})
+        const demande = await prisma.demandeStage.findUnique({where:{reference},include:{offre:true,creneau:true}})
 
         if(!demande){
+
             return res.status(404).json({message:'demande introuvable'})
         }
+        
     console.log(demande.offre.nomOffre)
+
     return res.status(200).json(demande)
         
     } catch (error) {
+
         return  res.status(500).json({message:`${error}`})
+
     }
 
   },
 
 //   suppression d'une demande 
 
-  deleteDemande:async(req,res)=>{
+  deleteDemande: async (req,res) => {
 
     try {
         
@@ -188,11 +215,13 @@ export const DemandeStage = {
 
          await prisma.demandeStage.delete({where:{id}})
 
+         await supabase.storage.from('cv').remove([recup.cv]);
+
          return res.status(204).json()
 
     } catch (error) {
         
-        return res.status(500).json({message:error})
+        return res.status(500).json({message:`${error}`})
     }
   }
  }
