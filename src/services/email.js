@@ -24,14 +24,14 @@ const mailOption= {
           `Cordialement \n L'équipe BMPHUB`,
 
     html:`
-     <div style="background-color:#01c93d; font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif ; color: white;padding:4px 0 10px 10px; border-radius: 10px; box-shadow:2px 2px 10px rgb(186, 177, 227);">  
+     <div style="background-color:#0a1bb5; font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif ; color: white;padding:4px 0 10px 10px; border-radius: 10px; box-shadow:2px 2px 10px rgb(186, 177, 227);">  
        <h2 style="margin:0 0 16px;font-size:20px;color:#111827;font">
           Bonjour,
         </h2>
      
         <p style="margin:0 0 12px;">
           Nous avons bien reçu votre demande de stage et votre 
-          numero de reference unique est :<i style="font-weight:bold; font-size:16px">${uniqueref}</i> .
+          numero de reference unique est :<strong style="font-weight:bold; font-size:12px">${uniqueref}</strong> .
           Ne le partagez à personne ; Nous vous  remercions.
         </p>
         <p style="margin:0 0 12px;">
@@ -71,7 +71,7 @@ sendUpdated: async(statutDemande,email)=>{
         </h2>
      
         <p style="margin:0 0 12px;">
-          Votre demande actuelle viens e passer à l'état :<i style="font-weight:bold;"> ${statutDemande} </i>
+          Votre demande actuelle est:<strong style="font-weight:bold;"> ${statutDemande} </strong>
         </p>
         <p style="margin:0 0 12px;">
           Notre équipe  Vous informera des avancements à venir

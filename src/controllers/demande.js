@@ -5,10 +5,12 @@ import {mailSend} from '../services/email.js'
 import { supabase } from '../config/supabase.js'
 
 export const DemandeStage = {
+
+    // Creation d'une demande 
   
     CreateDemande : async(req,res)=>{
 
-      let filePath = null
+      let filePath
 
   try {
   
@@ -20,42 +22,43 @@ export const DemandeStage = {
 
         console.log(req.file)
 
-        const filePath=`${uuidv4()}-${originalname}`
+       filePath=`${uuidv4()}`
 
-        if(!nom || !prenom || !telephone || !email || !offreId || !creneauId){
-                     
-                 return res.status(400).json({message:'Donnes manquantes'})
-        }
+        if(!nom || !prenom || !telephone || !email || !offreId || !creneauId) return res.status(400).json({message:'Données manquantes'})
 
         // verification des offres et de la disponibilte des creneaux
 
         const offre = await prisma.offreStage.findUnique({where:{id:offreId}})
+
 
         if(!offre) return res.status(404).json({message:'offre non retrouve'})
 
         
         const creneau = await prisma.creneau.findUnique({where:{id:creneauId}})
 
-        if(creneau || !creneau.disponible) return res.status(409).json({message:'Creneau indisponible '})
+        if(!creneau || !creneau.disponible) return res.status(409).json({message:'Creneau indisponible '})
 
             
             // Envoie du fichier cv dans Supabase Storage
 
            const {error} = await supabase.storage
+
             .from('cv')
+
             .upload(filePath,buffer,{contentType:'application/pdf'})
 
-         if(error) return res.status(400).json({error:error.message})
+         if(error) return res.status(500).json({error:error.message})
 
 // construction du num de reference pour chaque demande 
 
             const prefixe = nom.slice(0,3).toUpperCase()
 
-            const suffixe = Math.floor(Math.random()*9999 + 10000)
+            const suffixe = Math.floor(Math.random()*10000 + 99999 )
 
             const ref =`${prefixe}-${suffixe}`
 
 // envoie du contenue avec le nom du fichier en base de donnee mongodb
+
         const data = await prisma.demandeStage.create({data:{
             nom,
             prenom,
@@ -69,7 +72,8 @@ export const DemandeStage = {
 
        include:{    offre:{ select:{nomOffre:true ,    
                              intitule:true ,
-                             description:true}
+                             description:true,
+                             date:true}
                            },
 
                     creneau:{select:{ date:true,
@@ -83,9 +87,8 @@ export const DemandeStage = {
 
   await mailSend.sendMessage(email,nom,ref).catch((error)=>{console.log(error)})
 
-   return res.status(200).json({data})
+   return res.status(201).json({data})
           
-
     } catch (error) {
 
     supabase.storage.from('cv').remove([filePath])
@@ -96,7 +99,6 @@ export const DemandeStage = {
 
  },
  
-
  //  recuperation de l'url du cv stocké dans supabase 
 
  getCv: async (req,res) => {
@@ -115,13 +117,12 @@ export const DemandeStage = {
 
     const {data} = await supabase.storage.from('cv').getPublicUrl(demande.cv)
 
-    console.log(data.publicUrl)
+    // console.log(data.publicUrl)
 
-    return res.status(200).json({message:'ressource recupere avec succes'})
+    return res.status(200).json({message:'ressource recupere avec succes',cv:data.publicUrl})
         
-
     } catch (error) {
-        return res.status(500).json({message:error.name})
+        return res.status(500).json({message:`${error}`})
     }
 
  },
@@ -168,36 +169,57 @@ export const DemandeStage = {
         return res.status(200).json(demandes)
         
     } catch (error) {
+
         return res.status(500).json({message:`${error}`})
+
     }
  },
  
-//  recuperation d'une demande specifique
+//  recuperation d'une demande specifique avec un numero de reference
 
   getDemande: async (req,res) => {
-
     try {
 
         const {reference}=req.params
 
-        const demande = await prisma.demandeStage.findUnique({where:{reference},include:{offre:true,creneau:true}})
+        const demande = await prisma.demandeStage.findUnique({where:{reference}, include:{creneau:true}})
 
         if(!demande){
-
             return res.status(404).json({message:'demande introuvable'})
         }
         
-    console.log(demande.offre.nomOffre)
-
     return res.status(200).json(demande)
         
     } catch (error) {
 
-        return  res.status(500).json({message:`${error}`})
+        return  res.status(500).json({message:`${error.message}`})
 
     }
 
   },
+
+//   recuperation d'une demande par son id 
+
+  getDemandeByid: async (req,res)=>{
+
+    try {
+        
+    const {id}=req.params
+
+    const demande = await prisma.demandeStage.findUnique({where:{id},include:{offre:true,creneau:true}})
+
+    if(!demande) return res.status(404).json({message:'demande introuvable'})
+     
+        console.log(demande.offre.nomOffre,demande.creneau.date)
+        
+    return res.status(200).json(demande)
+
+     } catch (error) {
+
+        return res.status(500).json({message:`${error.message}`})
+    }
+  },
+
 
 //   suppression d'une demande 
 
@@ -210,7 +232,9 @@ export const DemandeStage = {
         const recup = await prisma.demandeStage.findUnique({where:{id}})
 
         if(!recup) {
+
             return res.status(404).json({message:'Demande non existante'})
+
         }
 
          await prisma.demandeStage.delete({where:{id}})
@@ -222,6 +246,7 @@ export const DemandeStage = {
     } catch (error) {
         
         return res.status(500).json({message:`${error}`})
+
     }
   }
  }

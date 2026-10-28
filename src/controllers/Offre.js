@@ -33,7 +33,7 @@ const offreStage = {
           
   },
 
-  getOffres: async (req,res)=>{
+  getOffres: async (req,res) => {
     try {
       const offres = await prisma.offreStage.findMany()
 
@@ -53,12 +53,15 @@ const offreStage = {
         try {
 
           const {id}=req.params
+
           const {nomOffre,intitule,description}=req.body
+
           const verifOffre = await prisma.offreStage.findUnique({where:{id}})
 
           if(!verifOffre){
 
             return res.status(404).json({message:'Offre non trouvable'})
+
           }
 
         const updated =  await prisma.offreStage.update({
@@ -77,6 +80,7 @@ const offreStage = {
   },
 
   deleteOffre:async (req,res)=>{
+
     try {
 
       const {id}=req.params

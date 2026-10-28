@@ -111,6 +111,7 @@ const AuthAdmin = {
      }
  },
 
+ 
 //  logique pour l'expiration du token 
 
  refreshToken : async (req,res) =>{
@@ -141,7 +142,7 @@ const AuthAdmin = {
 
             const newToken = generateAccessToken(admin)
 
-            return res.status(200).json({message:newToken})
+            return res.status(200).json({message:'Token regeneré avec succès',token:newToken})
 
          } catch (error) {
          

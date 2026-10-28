@@ -60,12 +60,14 @@ import {v4 as uuidv4} from 'uuid'
         }
     },
 
-    getAll:async (req,res)=>{
+    getAll: async (req,res)=>{
 
         const allCreneau = await prisma.creneau.findMany()
 
         if(!allCreneau){
+
             return res.status(404).json({message:'Creneaux non existants'})
+
         }
 
         return res.status(200).json(allCreneau)

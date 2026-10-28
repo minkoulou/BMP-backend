@@ -34,6 +34,7 @@ model OffreStage {
   intitule     String
   description  String
   demande      DemandeStage[] 
+  date         DateTime @default(now())
 }
 
 model Creneau {

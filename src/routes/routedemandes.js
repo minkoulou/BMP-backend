@@ -18,8 +18,11 @@ routedemandeStage.get('/admin/demandes',verify,DemandeStage.getAllDemande)
 // Route pour telecharger les cv 
 routedemandeStage.get('/admin/demandes/:id/cv',verify,DemandeStage.getCv)
 
-// Recuperation d'une demande specifique
+// Recuperation d'une demande specifique avec son numero de referene unique
 routedemandeStage.get('/demande/suivi/:reference',DemandeStage.getDemande)
+
+// Recuperation d'une demande specifique avec son identifiant
+routedemandeStage.get('/admin/demande/:id',verify,DemandeStage.getDemandeByid)
 
 // Suppression des demandes par l'administrateur
 routedemandeStage.delete('/admin/demande/:id',verify,DemandeStage.deleteDemande)
