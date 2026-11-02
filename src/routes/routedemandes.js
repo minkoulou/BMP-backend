@@ -7,7 +7,7 @@ import { Router } from 'express'
 export const routedemandeStage = Router()
 
 // Envoie de la demande en base de donnees dans mongoDB et le cv dans supabase
-routedemandeStage.post('/demandes',upload.single('cv'),DemandeStage.CreateDemande)
+routedemandeStage.post('/demande',upload.single('cv'),DemandeStage.CreateDemande)
 
 // Modification de la demande (StatutDemande)
 routedemandeStage.put('/admin/demandes/:id',verify,DemandeStage.updateDemande)

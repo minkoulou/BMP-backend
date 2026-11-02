@@ -1,8 +1,8 @@
 import 'dotenv/config'
 import app from "./src/app.js";
 
-const PORT=3000;
-const localhost='127.0.0.1'
+const PORT=process.env.PORT || 3000;
+const localhost=process.env.ADDRESS
 
 app.listen(PORT,localhost,()=>{
     console.log(`le serveur tourne sur ${localhost}:${PORT}`);
