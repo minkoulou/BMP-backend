@@ -151,6 +151,8 @@ Les identifiants (`ADMIN_EMAIL`, `ADMIN_PASSWORD`) sont lus depuis le fichier `.
 
 Les routes `/api/admin/*` (hors login/signup) sont protégées par un middleware de vérification du token JWT.
 
+## lien de mon api:  https://bmp-hub-api.fly.dev/ 
+
 ## Auteur
 
 MINKOULOU MINKOULOU BENOIT PASCAL — étudiant en L3 Informatique, Université de Yaoundé I
